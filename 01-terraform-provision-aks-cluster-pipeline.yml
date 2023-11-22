@@ -97,3 +97,48 @@ stages:
                    workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
                    commandOptions: '$(Pipeline.Workspace)/terraform-manifests-out/$(DEV_ENVIRONMENT)-$(Build.BuildId).out'
                    environmentServiceNameAzureRM: 'terraform-aks-azurerm-svc-con'
+
+      - deployment: DeployCTCAKSCluster
+        dependsOn: DeployDevAKSCluster
+        displayName: Deploy CTC AKS Cluster
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: $(CTC_ENVIRONMENT)
+        strategy:
+         runOnce:
+           deploy:
+             steps:
+               - task: DownloadSecureFile@1
+                 displayName: Download SSH key
+                 name: sshkey
+                 inputs:
+                   secureFile: 'aks-terraform-devops-ssh-key-ubunbtu.pub'
+               - task: TerraformTaskV4@4
+                 displayName: Terraform intialization
+                 inputs:
+                   provider: 'azurerm'
+                   command: 'init'
+                   workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                   backendServiceArm: 'terraform-aks-azurerm-svc-con'
+                   backendAzureRmResourceGroupName: 'terraform-rg'
+                   backendAzureRmStorageAccountName: 'terraformstorage0101'
+                   backendAzureRmContainerName: 'tfstatefiles'
+                   backendAzureRmKey: 'aks-$(CTC_ENVIRONMENT).tfstate'
+
+               - task: TerraformTaskV4@4
+                 displayName: Terraform Plan
+                 inputs:
+                   provider: 'azurerm'
+                   command: 'plan'
+                   workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                   commandOptions: '-var ssh_public_key=$(sshkey.secureFilePath) -var environment=$(CTC_ENVIRONMENT) -out $(Pipeline.Workspace)/terraform-manifests-out/$(CTC_ENVIRONMENT)-$(Build.BuildId).out'
+                   environmentServiceNameAzureRM: 'terraform-aks-azurerm-svc-con'
+                   
+               - task: TerraformTaskV4@4
+                 displayName: Terraform Apply
+                 inputs:
+                   provider: 'azurerm'
+                   command: 'apply'
+                   workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                   commandOptions: '$(Pipeline.Workspace)/terraform-manifests-out/$(CTC_ENVIRONMENT)-$(Build.BuildId).out'
+                   environmentServiceNameAzureRM: 'terraform-aks-azurerm-svc-con'
