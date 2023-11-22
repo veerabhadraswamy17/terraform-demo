@@ -5,7 +5,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "win_np_101" {
     max_count = 1
     min_count = 1
     mode = "User"
-    name = "win_np_101"
+    name = "winnp101"
     orchestrator_version = data.azurerm_kubernetes_service_versions.current.latest_version
     os_disk_size_gb = 60
     os_type = "Windows"
