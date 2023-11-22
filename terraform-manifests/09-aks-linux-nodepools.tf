@@ -5,7 +5,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "linux_nodepool_101" {
     max_count = 1
     min_count = 1
     mode = "User"
-    name = linux_nodepool_101
+    name = "linux_nodepool_101"
     orchestrator_version = data.azurerm_kubernetes_service_versions.current.latest_version
     os_disk_size_gb = 30
     os_type = "Linux"
