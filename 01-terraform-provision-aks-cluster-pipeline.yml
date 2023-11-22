@@ -1,0 +1,49 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: TerraformValidate
+    jobs:
+      - job: TerraformValidateJob
+        continueOnError: false
+        steps:
+        - task: PublishPipelineArtifact@1
+          displayName: Publish Artifacts
+          inputs:
+            targetPath: '$(Pipeline.Workspace)/terraform-manifests/Deploy-AKS-cluster'
+            artifact: 'terraform-manifests-out'
+            publishLocation: 'pipeline'
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: 'latest'
+        
+        - task: TerraformTaskV4@4
+          displayName: Terraform Initialization
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-manifests/Deploy-AKS-cluster'
+            backendServiceArm: 'terraform-aks-azurerm-svc-con'
+            backendAzureRmResourceGroupName: 'terraform-rg'
+            backendAzureRmStorageAccountName: 'terraformstorage0101'
+            backendAzureRmContainerName: 'tfstatefiles'
+            backendAzureRmKey: 'aks-base.tfstate'
+        
+        - task: TerraformTaskV4@4
+          displayName: Terraform validation
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-manifests/Deploy-AKS-cluster'
+
+        
+        
