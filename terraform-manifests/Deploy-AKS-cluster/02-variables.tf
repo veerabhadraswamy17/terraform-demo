@@ -1,5 +1,5 @@
 variable "environment" {
-    default = "dev"
+    # default = "dev"
     description = "dev environment"  
     type = string
 }
@@ -24,7 +24,7 @@ variable "location" {
 }
 
 variable "ssh_public_key" {
-    default = "~/.ssh/aks-dev-sshkeys-terraform/aksdevsshkey.pub"
+    # default = "~/.ssh/aks-dev-sshkeys-terraform/aksdevsshkey.pub"
     description = "ssh key for linux nodes"
   
 }
