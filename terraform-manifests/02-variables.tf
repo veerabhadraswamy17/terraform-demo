@@ -18,7 +18,7 @@ variable "aks-rg-number" {
 }
 
 variable "location" {
-    default = "eastUS"
+    default = "uksouth"
     description = "location where all resources will be created"
     type = string
 }
