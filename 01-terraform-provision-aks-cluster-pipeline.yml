@@ -146,7 +146,7 @@ stages:
                    environmentServiceNameAzureRM: 'terraform-aks-azurerm-svc-con'
 
       - deployment: DeployProdAKSCluster
-        dependsOn: DeployProdAKSCluster
+        dependsOn: DeployCTCAKSCluster
         displayName: Deploy Prod AKS Cluster
         pool:
           vmImage: 'ubuntu-latest'
